@@ -19,29 +19,32 @@ def split_image(image_filepath):
 
     return left_page, right_page
 
-def split_left_right(input_path, output_path):
+def split_left_right(input_path, output_path, image_extension='.png'):
     """
     Take a path with a bunch of images. Splits them down the middle
-    then saves the left and right image with extension ...-02.jpg
-    and ...-01.jpg. Here ... represents the name of the original
-    image
+    then saves the left and right image with the specific extension
+    so ...-02.jpg and ...-01.jpg. 
+    Here ... represents the name of the original image.
     """
-    for fp in sorted(input_path.glob('**/*.jpg')):
+    assert image_extension in ['.png','.jpg'], 'only .jpg or .png supported'
+    
+    for fp in sorted(input_path.glob(f'**/*{image_extension}')):
         # print(f'Reading {fp}')
         left_image, right_image = split_image(fp)
     
-        right_name = fp.name[:-4]+ '-01' #recall that last 4 are .jpg
-        right_fp = (output_path / right_name ).with_suffix('.jpg')    
+        right_name = fp.name[:-4]+ '-01' #recall that last 4 are .jpg or .png
+        right_fp = (output_path / right_name ).with_suffix(image_extension)    
         
-        left_name = fp.name[:-4]+ '-02' #recall that last 4 are .jpg
-        left_fp = (output_path / left_name ).with_suffix('.jpg')
+        left_name = fp.name[:-4]+ '-02' #recall that last 4 are .jpg or .png
+        left_fp = (output_path / left_name ).with_suffix(image_extension)
     
         right_image.save(right_fp)
         left_image.save(left_fp)
     print('Done!')
 
-def extract_text(images_path, output_path):
-    for fp in sorted(images_path.glob('**/*.jpg')):
+def extract_text(images_path, output_path, image_extension='.png'):
+    assert image_extension in ['.png','.jpg'], 'only .jpg or .png supported'
+    for fp in sorted(images_path.glob(f'**/*{image_extension}')):
         # print(f'Reading {fp}')
         text = pytesseract.image_to_string(Image.open(fp), lang='jpn_vert')
         new_fp = (output_path / fp.name).with_suffix('.txt')
